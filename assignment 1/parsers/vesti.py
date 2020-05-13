@@ -59,7 +59,6 @@ class VestiNewsParser(BaseNewsParser):
                 news_url = f"{self.news_url}{news_path}"
             try:
                 with requests.get(news_url) as r:
-
                     if r.status_code != 200:
                         continue
                     text = r.text
@@ -84,7 +83,8 @@ class VestiNewsParser(BaseNewsParser):
                 if news_text:
                     news = {
                         'title': title,
-                        'content': news_text
+                        'content': news_text,
+                        'url': news_url
                     }
                     result.append(news)
                 time.sleep(self.delay)

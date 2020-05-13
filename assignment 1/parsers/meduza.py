@@ -58,7 +58,8 @@ class MeduzaNewsParser(BaseNewsParser):
 
             news = {
                 'title': title,
-                'content': body_text
+                'content': body_text,
+                'url': news_url
             }
             result.append(news)
             time.sleep(self.delay)

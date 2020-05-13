@@ -13,11 +13,10 @@ def get_news_dataframe(parser, count_to_download):
     parser_name = parser.__class__.__name__
     print(f'{parser_name}:  Work started.')
     news = parser.get_news(count_to_download)
-    new_news = pandas.DataFrame(news)
-
-    new_news['source'] = parser_name
+    news_frame = pandas.DataFrame(news)
+    news_frame['source'] = parser_name
     print(f'{parser_name}: Work done.')
-    return new_news
+    return news_frame
 
 
 if __name__ == '__main__':

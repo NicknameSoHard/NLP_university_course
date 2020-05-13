@@ -67,7 +67,8 @@ class LentaNewsParser(BaseNewsParser):
             if news_text:
                 news = {
                     'title': title,
-                    'content': news_text
+                    'content': news_text,
+                    'url': news_url
                 }
                 result.append(news)
             time.sleep(self.delay)
