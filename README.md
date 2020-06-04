@@ -11,5 +11,5 @@ Arguments:
 <code>-n</code> - number news that be splitted by all news sources.   
 <code>-f</code> - file, where all news be saved
 
-# Assignment 2
+# Assignment 2+
 This is jupyter notebooks files and all information inside them.
