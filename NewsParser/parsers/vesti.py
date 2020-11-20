@@ -1,5 +1,3 @@
-import re
-
 import requests
 import time
 
@@ -29,15 +27,14 @@ class VestiNewsParser(BaseNewsParser):
         while True:
             str_date = date.strftime('%d.%m.%Y')
             date_url = f"{search_url}/{str_date}"
-            r = requests.get(date_url)
-            if r.status_code != 200:
-                continue
-
-            page = BeautifulSoup(r.text, 'lxml')
-            item_list = page.findAll('h3', class_='b-item__title')
-            need_news = number_news - len(news_stack)
-            news_from_page = self.__parse_all_news(item_list, need_news)
-            news_stack.extend(news_from_page)
+            with requests.get(date_url) as r:
+                if r.status_code != 200:
+                    continue
+                page = BeautifulSoup(r.text, 'lxml')
+                item_list = page.findAll('h3', class_='list__title')
+                need_news = number_news - len(news_stack)
+                news_from_page = self.__parse_all_news(item_list, need_news)
+                news_stack.extend(news_from_page)
 
             if len(news_stack) >= number_news:
                 break
@@ -47,10 +44,7 @@ class VestiNewsParser(BaseNewsParser):
 
     def __parse_all_news(self, item_list, need_news):
         result = list()
-        for item in item_list:
-            if len(result) >= need_news:
-                break
-
+        for item in item_list[:need_news]:
             news = item.find('a')
             news_path = news.get('href')
 
@@ -79,17 +73,19 @@ class VestiNewsParser(BaseNewsParser):
             news_text = page.find('div', class_='js-mediator-article')
             if news_text is not None:
                 news_text = news_text.get_text()
-                news_text = self.__drop_special_symbols(news_text)
-                if news_text:
-                    news = {
-                        'title': title,
-                        'content': news_text,
-                        'url': news_url
-                    }
-                    result.append(news)
+                news_text = self.drop_special_symbols(news_text)
+
+            tags = page.find_all('a', class_='tags__item')
+            if tags:
+                tags = [t.get_text() for t in tags]
+
+            if news_text and tags:
+                news = {
+                    'title': title,
+                    'content': news_text,
+                    'url': news_url,
+                    'tags': tags
+                }
+                result.append(news)
                 time.sleep(self.delay)
         return result
-
-    @staticmethod
-    def __drop_special_symbols(string):
-        return re.sub(r'/[^a-zа-яA-ZА-Я ]/ui', '', string).replace('\n', ' ')

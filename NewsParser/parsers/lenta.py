@@ -1,4 +1,3 @@
-import re
 import requests
 import time
 
@@ -47,10 +46,7 @@ class LentaNewsParser(BaseNewsParser):
     def __parse_longrid(self, longrid, need_news):
         result = list()
         tabloids_news = longrid.findAll('a')
-        for div_news in tabloids_news:
-            if len(result) >= need_news:
-                break
-
+        for div_news in tabloids_news[:need_news]:
             news_path = div_news.get('href')
             news_url = f"{self.news_by_date_url}/{news_path}"
             r = requests.get(news_url)
@@ -59,21 +55,18 @@ class LentaNewsParser(BaseNewsParser):
 
             page = BeautifulSoup(r.text, 'lxml')
             title = div_news.string
-            news_text = ''
-            for p in page.findAll('p'):
-                news_text += p.get_text()
-            news_text = self.__drop_special_symbols(news_text)
 
-            if news_text:
+            tags = ','.join([str(t.get_text()) for t in page.select('.active')])
+            news_text = ''.join([str(p.get_text()) for p in page.findAll('p')])
+            news_text = self.drop_special_symbols(news_text)
+
+            if news_text and tags:
                 news = {
                     'title': title,
                     'content': news_text,
-                    'url': news_url
+                    'url': news_url,
+                    'tags': tags
                 }
                 result.append(news)
             time.sleep(self.delay)
         return result
-
-    @staticmethod
-    def __drop_special_symbols(string):
-        return re.sub(r'/[^a-zа-я ]/ui', '', string).replace('\n', ' ')

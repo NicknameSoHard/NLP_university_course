@@ -43,9 +43,7 @@ class MeduzaNewsParser(BaseNewsParser):
 
     def __get_full_news(self, news_urls: list, need_news):
         result = list()
-        for news_path in news_urls:
-            if len(result) >= need_news:
-                break
+        for news_path in news_urls[:need_news]:
             news_url = f"{self.api_url}/{news_path}"
             r = requests.get(news_url)
             if r.status_code != 200:
@@ -55,11 +53,13 @@ class MeduzaNewsParser(BaseNewsParser):
             body = root['content']['body']
             body_text = self.__get_news_text(body)
             title = root['title']
+            tag = root['tag']['name']
 
             news = {
                 'title': title,
                 'content': body_text,
-                'url': news_url
+                'url': news_url,
+                'tags': tag
             }
             result.append(news)
             time.sleep(self.delay)
