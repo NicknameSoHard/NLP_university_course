@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pandas
 
-from parsers import MeduzaNewsParser, LentaNewsParser, VestiNewsParser
+from NewsParser.parsers import MeduzaNewsParser, LentaNewsParser, VestiNewsParser
 
 news_parsers = (VestiNewsParser, LentaNewsParser, MeduzaNewsParser)
 
